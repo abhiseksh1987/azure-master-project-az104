@@ -1,5 +1,9 @@
 # azure-master-project-az104
 End-to-end Azure infrastructure project covering all AZ-104 objectives (Networking, Compute, Storage, Identity, Governance, Backup, Monitoring, Automation)
+
+🎯 Objective
+Build and manage a mini enterprise environment in Azure covering all AZ-104 objectives:
+
 ## 📂 Repository Structure
 - `/docs` → Screenshots, diagrams, and step-by-step documentation
 - `/bicep` → Infrastructure as Code templates (to be added later)
@@ -8,13 +12,14 @@ End-to-end Azure infrastructure project covering all AZ-104 objectives (Networki
 - `README.md` → Overview of the project
 
 ## 🛠 Project Phases
-1. **Networking** – VNets, Subnets, NSGs, Peering, VPN Gateway
-2. **Compute** – VMs, Scale Sets, Load Balancers, App Service
-3. **Storage** – Blob, File Shares, Managed Disks, SAS
-4. **Identity & Governance** – Azure AD, RBAC, Policies, Locks
-5. **Backup & Recovery** – Recovery Services Vault, Site Recovery
-6. **Monitoring** – Azure Monitor, Alerts, Dashboards
-7. **Automation** – ARM, Bicep, CLI, Automation Accounts
+Phase1-**Networking** (VNets, NSGs, Peering, VPN Gateway, DNS)
+Phase2-**Compute** (VMs, Scale Sets, Load Balancers, Availability Sets, Azure App Service)
+Phase3-**Storage** (Blob, Files, Queues, Tables, Disks, Encryption, Shared Access Signatures)
+Phase4-**Identity & Security** (Azure AD, RBAC, MFA, Conditional Access, Managed Identities)
+Phase5-**Governance** (Policies, Locks, Blueprints, Tags, Cost Management)
+Phase6-**Backup & Recovery** (Recovery Vault, Backup policies, Site Recovery basics)
+Phase7-**Monitoring** (Azure Monitor, Log Analytics, Alerts, Metrics, Diagnostics)
+Phase8-**Automation** (Deploy resources using Bicep templates, Cloud Shell, and ARM exports)
 
 ## ✅ Deliverables
 - Step-by-step documentation with screenshots
