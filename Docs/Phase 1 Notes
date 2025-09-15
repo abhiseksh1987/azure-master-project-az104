@@ -1,1 +1,123 @@
+# Phase 1 – Networking Foundation
+
+This document explains the design, configuration, and reasoning behind the Networking Foundation built in Phase 1 of the **Enterprise Infra + Governance Project**.
+
+---
+
+## 1️⃣ Resource Groups
+- **What we did:**
+  - `RG-Hub-Networking` → For Hub VNet, Firewall, Shared Services, NSGs.
+  - `RG-Dev-Networking` → For Dev VNet and NSGs.
+  - `RG-Prod-Networking` → For Prod VNet and NSGs.
+- **Why we did it:**
+  - Clear **separation of environments** (Hub, Dev, Prod).
+  - Supports **RBAC** (we can assign different teams access to their own RG).
+  - Helps in **cost tracking** and reporting.
+
+---
+
+## 2️⃣ Virtual Networks (VNets)
+- **What we did:**
+  - **Hub VNet:** `10.0.0.0/16` → Centralized hub for shared services + firewall.
+  - **Dev VNet:** `10.1.0.0/16` → For development workloads.
+  - **Prod VNet:** `10.2.0.0/16` → For production workloads.
+- **Why we did it:**
+  - VNets provide **isolation** between environments.
+  - CIDR blocks chosen to avoid overlap → critical for **VNet peering**.
+  - Hub-and-Spoke model aligns with **enterprise governance** patterns.
+
+---
+
+## 3️⃣ Subnets
+- **What we did (Hub VNet):**
+  - **AzureFirewallSubnet:** `10.0.0.0/24` → Required by Azure Firewall.
+  - **SharedServices:** `10.0.1.0/24` → For jumpboxes, monitoring, shared tools.
+- **Why we did it:**
+  - Dedicated firewall subnet ensures **security boundary enforcement**.
+  - Shared services subnet centralizes tools → reduces duplication in Dev/Prod.
+  - Using `/24` blocks provides enough IPs while keeping subnets easy to manage.
+
+---
+
+## 4️⃣ VNet Peering
+- **What we did:**
+  - Peered **Hub ↔ Dev**.
+  - Peered **Hub ↔ Prod**.
+  - ❌ Did **not** peer Dev ↔ Prod directly.
+- **Why we did it:**
+  - In hub-and-spoke, **spokes do not directly connect**.
+  - Forces all Dev ↔ Prod traffic to flow through Hub → enabling **firewall inspection** and **policy enforcement**.
+- **Expected behavior:**
+  - Dev ↔ Hub works ✅
+  - Prod ↔ Hub works ✅
+  - Dev ↔ Prod does **not** work ❌ (by design, until firewall + routes are set up in Phase 2).
+
+---
+
+## 5️⃣ Network Security Groups (NSGs)
+- **What we did:**
+
+1. **NSG-Dev-App**
+   - Allow **RDP (3389) / SSH (22)** only from **my public IP**.
+   - **Why:** Protects Dev VMs from being exposed. Admins/devs can connect securely from trusted IPs only.
+
+2. **NSG-Prod-DB**
+   - Allow **SQL (1433)** only from **Prod-App subnet**.
+   - **Why:** Implements **tiered architecture**. Database is never directly reachable from internet → only from App layer inside Prod.
+
+3. **NSG-SharedServices**
+   - Allow **HTTP (80)** + **RDP (3389)** from **within VNets only**.
+   - **Why:** Shared tools are accessible internally (from Hub/Dev/Prod) but **shielded from the public internet**.
+
+- **Overall Why:**  
+  - NSGs enforce **least-privilege networking**.  
+  - Each NSG was designed for its role:
+    - Dev = secure but admin-accessible.
+    - Prod = secure, no outside exposure.
+    - Shared Services = internal-only access.  
+
+---
+
+## 6️⃣ Addressing Scheme
+- **What we did:**
+  - Hub → `10.0.0.0/16`
+  - Dev → `10.1.0.0/16`
+  - Prod → `10.2.0.0/16`
+- **Why we did it:**
+  - No overlapping CIDRs → peering works without issues.
+  - `/16` allocations → allow many `/24` subnets in each VNet.
+  - Future-proofing → we can expand with App, DB, Web subnets later.
+
+---
+
+## 7️⃣ Security & Isolation
+- **What we did:**
+  - Hub-and-Spoke architecture.
+  - Subnet-level security with NSGs.
+- **Why we did it:**
+  - **Blast radius reduction:** If Dev is compromised, Prod remains safe.
+  - **Controlled communication:** Dev ↔ Prod blocked until approved through firewall in Phase 2.
+  - **Enterprise readiness:** Matches real-world governance models.
+
+---
+
+## 8️⃣ Documentation & Governance
+- **What we did:**
+  - Structured files in GitHub repo → `/docs/networking/Phase1-Networking.md`.
+  - Included architecture diagram.
+- **Why we did it:**
+  - Easy onboarding for new team members.
+  - Clear audit trail for compliance.
+  - Resume showcase → demonstrates **design thinking + execution**.
+
+---
+
+## ✅ End Result of Phase 1
+We now have a **secure, well-structured networking foundation** with:
+- Hub VNet (centralized security + shared services).
+- Dev & Prod VNets (isolated, future-proof).
+- Peering model (Hub ↔ Spokes only).
+- NSGs enforcing role-specific security.
+- Clear documentation for scaling in future phases.
+
 
